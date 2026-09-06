@@ -75,7 +75,6 @@ public class PlayerMovement : MonoBehaviour
     private float _currentAnimVelZ;
     private float _animVelXRef;
     private float _animVelZRef;
-    private float _animSmoothTime = 1f;
 
     private void Awake()
     {
@@ -143,7 +142,7 @@ public class PlayerMovement : MonoBehaviour
             return;
         }
 
-        _animator.SetBool("isGrounded", _isGrounded);
+        _animator.SetBool("IsGrounded", _isGrounded);
     }
 
     private void CheckStep()
@@ -180,34 +179,54 @@ public class PlayerMovement : MonoBehaviour
         {
             Vector3 currentVelocity = _rigidbody.linearVelocity;
             Vector3 currentHorizontal = new Vector3(_rigidbody.linearVelocity.x, 0f, _rigidbody.linearVelocity.z);
-            Vector3 velocity = Vector3.zero;
 
             Vector3 desiredDirection = Vector3.zero;
 
-            switch (_cameraManager.State)
+            if (inputAxis.magnitude > 0.1f)
             {
-                case CameraState.ThirdPerson:
-                    float targetAngle = Mathf.Atan2(inputAxis.x, inputAxis.y) * Mathf.Rad2Deg + _cameraTransform.eulerAngles.y;
-                    desiredDirection = Quaternion.Euler(Vector3.up * targetAngle).normalized * Vector3.forward;
+                switch (_cameraManager.State)
+                {
+                    case CameraState.ThirdPerson:
+                        float targetAngle = Mathf.Atan2(inputAxis.x, inputAxis.y) * Mathf.Rad2Deg + _cameraTransform.eulerAngles.y;
+                        desiredDirection = Quaternion.Euler(Vector3.up * targetAngle).normalized * Vector3.forward;
 
-                    if (inputAxis.magnitude > 0.01f)
+                        // if (inputAxis.magnitude > 0.01f)
                         RotateTowards(targetAngle, _rotationSmoothTime, ref _rotationSmoothVelocity);
 
-                    break;
+                        break;
 
-                case CameraState.FirstPerson:
-                    desiredDirection = (inputAxis.x * transform.right) + (inputAxis.y * transform.forward).normalized;
-                    break;
+                    case CameraState.FirstPerson:
+                        desiredDirection = (inputAxis.x * transform.right) + (inputAxis.y * transform.forward).normalized;
+                        break;
+                }
             }
 
-            MoveTowards(desiredDirection);
+            // MoveTowards(desiredDirection);
+            AddForceTowards(desiredDirection);
             UpdateStandAnimator();
         }
 
         if (isClimbing)
         {
-            Vector3 horizontal = inputAxis.x * transform.right;
-            Vector3 vertical = inputAxis.y * transform.up;
+            Vector3 horizontal = Vector3.zero;
+            Vector3 vertical = Vector3.zero;
+
+            Vector3 checkerLeftPosition = transform.position + transform.up + transform.right * -1f * 0.75f;
+            Vector3 checkerRightPosition = transform.position + transform.up + transform.right * 0.75f;
+            Vector3 checkerUpPosition = transform.position + transform.up * 2.5f;
+            Vector3 checkerDownPosition = transform.position + transform.up * -1f * 0.25f;
+
+            bool isAbleToClimbLeft = Physics.Raycast(checkerLeftPosition, transform.forward, _climbCheckDistance, _climbableLayer);
+            bool isAbleToClimbRight = Physics.Raycast(checkerRightPosition, transform.forward, _climbCheckDistance, _climbableLayer);
+            bool isAbleToClimbUp = Physics.Raycast(checkerUpPosition, transform.forward, _climbCheckDistance, _climbableLayer);
+            bool isAbleToClimbDown = Physics.Raycast(checkerDownPosition, transform.forward, _climbCheckDistance, _climbableLayer);
+
+            if (isAbleToClimbLeft && _cachedMoveInput.x < 0 || isAbleToClimbRight && _cachedMoveInput.x > 0)
+                horizontal = inputAxis.x * transform.right;
+
+            if (isAbleToClimbDown && _cachedMoveInput.y < 0 || isAbleToClimbUp && _cachedMoveInput.y > 0)
+                vertical = inputAxis.y * transform.up;
+
 
             ClimbTowards(horizontal + vertical);
             UpdateClimbAnimator();
@@ -241,21 +260,25 @@ public class PlayerMovement : MonoBehaviour
         _rigidbody.linearVelocity = new Vector3(smoothVelocity.x, _rigidbody.linearVelocity.y, smoothVelocity.z);
     }
 
+    private void AddForceTowards(Vector3 desiredDirection)
+    {
+        _rigidbody.AddForce(desiredDirection * _speed * Time.fixedDeltaTime, ForceMode.Force);
+    }
+
     private void UpdateStandAnimator()
     {
-        Vector3 horizontal = _cachedMoveInput.x * transform.right;
-        Vector3 forward = _cachedMoveInput.y * transform.forward;
-        Vector3 velocity = (horizontal + forward).normalized * _speed;
+        Vector3 newVelocity = new Vector3(_rigidbody.linearVelocity.x, 0f, _rigidbody.linearVelocity.z);
 
-        _animator.SetFloat("velocity", Mathf.Abs(velocity.magnitude));
-        _animator.SetFloat("velocityX", velocity.magnitude * _cachedMoveInput.x);
-        _animator.SetFloat("velocityZ", velocity.magnitude * _cachedMoveInput.y);
+        float velocityMagnitude = _cachedMoveInput.magnitude * newVelocity.magnitude;
+
+        _animator.SetFloat("Velocity", _cachedMoveInput.magnitude * newVelocity.magnitude);
+        _animator.SetFloat("VelocityX", newVelocity.magnitude * _cachedMoveInput.x);
+        _animator.SetFloat("VelocityZ", newVelocity.magnitude * _cachedMoveInput.y);
     }
 
     private void ClimbTowards(Vector3 desiredDirection)
     {
-        Vector3 velocity = desiredDirection.normalized * _climbSpeed;
-        _rigidbody.linearVelocity = velocity;
+        _rigidbody.AddForce(Time.fixedDeltaTime * _climbSpeed * desiredDirection.normalized);
     }
 
     private void UpdateClimbAnimator()
@@ -264,8 +287,8 @@ public class PlayerMovement : MonoBehaviour
         Vector3 vertical = _cachedMoveInput.y * transform.up;
         Vector3 velocity = (horizontal + vertical).normalized * _speed;
 
-        _animator.SetFloat("climbVelocityX", velocity.magnitude * _cachedMoveInput.x);
-        _animator.SetFloat("climbVelocityY", velocity.magnitude * _cachedMoveInput.y);
+        _animator.SetFloat("ClimbVelocityX", velocity.magnitude * _cachedMoveInput.x);
+        _animator.SetFloat("ClimbVelocityY", velocity.magnitude * _cachedMoveInput.y);
     }
 
 
@@ -280,27 +303,26 @@ public class PlayerMovement : MonoBehaviour
         if (isSprinting)
         {
             if (_speed < _sprintSpeed)
-            {
-                _speed = Mathf.Lerp(_speed, _sprintSpeed, _walkSprintTransition * Time.deltaTime);
-            }
+                _speed = _sprintSpeed;
         }
         else
         {
             if (_speed > _walkSpeed)
-            {
-                _speed = Mathf.Lerp(_speed, _walkSpeed, _walkSprintTransition * Time.deltaTime);
-            }
+                _speed = _walkSpeed;
         }
     }
 
     private void Jump()
     {
-        if (!_isGrounded) return;
+        if (!_isGrounded || _isPunching) return;
 
         Vector3 force = Vector3.up * _jumpForce;
         _rigidbody.AddForce(force, ForceMode.Impulse);
 
-        _animator.SetTrigger("jump");
+        _isGrounded = false;
+
+        _animator.SetBool("IsJump", true);
+        _animator.SetBool("IsJump", false);
     }
 
     private void StartClimb()
@@ -316,15 +338,20 @@ public class PlayerMovement : MonoBehaviour
 
         if (isInFrontOfClimbWall && isNotClimbing && _isGrounded)
         {
+            Vector3 climbablePoint = hit.collider.bounds.ClosestPoint(transform.position);
+            Vector3 direction = (climbablePoint - transform.position).normalized;
+            direction.y = 0f;
+            transform.rotation = Quaternion.LookRotation(direction);
+
             _rigidbody.useGravity = false;
-            _cameraManager.SetThirdPersonCamFOV(70f);
             _stance = PlayerStance.Climb;
             _capsuleCollider.center = Vector3.up * 1.3f;
+            _cameraManager.SetThirdPersonCamFOV(70f);
 
             Vector3 offset = (transform.forward * _climbOffset.z) + (Vector3.up * _climbOffset.y);
             transform.position = hit.point - offset;
 
-            _animator.SetBool("isClimbing", true);
+            _animator.SetBool("IsClimbing", true);
         }
     }
 
@@ -339,33 +366,29 @@ public class PlayerMovement : MonoBehaviour
 
         transform.position -= transform.forward;
 
-        _animator.SetBool("isClimbing", false);
+        _animator.SetBool("IsClimbing", false);
     }
 
     private void ChangePerspective()
     {
-        _animator.SetTrigger("switchPOV");
+        _animator.SetTrigger("ChangePerspective");
     }
 
     private void Crouch()
     {
         if (_stance == PlayerStance.Stand)
         {
-            _animator.SetBool("isCrouch", true);
+            _animator.SetBool("IsCrouch", true);
             _stance = PlayerStance.Crouch;
             _speed = _crouchSpeed;
-
-            Debug.Log($"Player stance: {_stance}");
             return;
         }
 
         if (_stance == PlayerStance.Crouch)
         {
-            _animator.SetBool("isCrouch", false);
+            _animator.SetBool("IsCrouch", false);
             _stance = PlayerStance.Stand;
             _speed = _walkSpeed;
-
-            Debug.Log($"Player stance: {_stance}");
             return;
         }
     }
@@ -375,7 +398,7 @@ public class PlayerMovement : MonoBehaviour
         if (_stance != PlayerStance.Glide && !_isGrounded)
         {
             _stance = PlayerStance.Glide;
-            _animator.SetBool("isGliding", true);
+            _animator.SetBool("IsGliding", true);
             _audioManager.PlayGlideSFX();
         }
     }
@@ -397,22 +420,22 @@ public class PlayerMovement : MonoBehaviour
         if (_stance == PlayerStance.Glide)
         {
             _stance = PlayerStance.Stand;
-            _animator.SetBool("isGliding", false);
+            _animator.SetBool("IsGliding", false);
             _audioManager.StopGlideSFX();
         }
     }
 
     private void Punch()
     {
-        if (!_isPunching && _stance == PlayerStance.Stand)
+        if (!_isPunching && _stance == PlayerStance.Stand && _isGrounded)
         {
             _isPunching = true;
 
             _combo += 1;
             if (_combo > 3) _combo = 1;
 
-            _animator.SetInteger("combo", _combo);
-            _animator.SetTrigger("punch");
+            _animator.SetInteger("Combo", _combo);
+            _animator.SetTrigger("Punch");
         }
     }
 
