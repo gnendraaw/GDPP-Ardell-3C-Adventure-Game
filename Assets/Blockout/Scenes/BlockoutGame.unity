@@ -6452,8 +6452,8 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 411465183}
   serializedVersion: 2
-  m_LocalRotation: {x: 0.0785606, y: -0.0000000033465757, z: 2.6372404e-10, w: 0.9969094}
-  m_LocalPosition: {x: 42.36, y: 5.693, z: -30.87}
+  m_LocalRotation: {x: 0.078608, y: 1.43643205e-11, z: 3.0763045e-10, w: 0.9969056}
+  m_LocalPosition: {x: 42.398, y: 5.233, z: -30.87}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -24072,8 +24072,8 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1299346192}
   serializedVersion: 2
-  m_LocalRotation: {x: 0.07856121, y: -0.0000000308069, z: 0.0000000024277307, w: 0.9969093}
-  m_LocalPosition: {x: 42.36, y: 5.4917846, z: -29.862926}
+  m_LocalRotation: {x: 0.078655995, y: 3.8863086e-11, z: -3.0663152e-12, w: 0.9969018}
+  m_LocalPosition: {x: 42.398, y: 5.0317845, z: -29.862926}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -26481,6 +26481,14 @@ PrefabInstance:
       propertyPath: m_PlayOnAwake
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 1304343889107085679, guid: 83628a2e699576147adabb30587f44d4, type: 3}
+      propertyPath: m_Height
+      value: 1.8
+      objectReference: {fileID: 0}
+    - target: {fileID: 1304343889107085679, guid: 83628a2e699576147adabb30587f44d4, type: 3}
+      propertyPath: m_Center.y
+      value: 0.9
+      objectReference: {fileID: 0}
     - target: {fileID: 2017104992030428576, guid: 83628a2e699576147adabb30587f44d4, type: 3}
       propertyPath: m_PlayOnAwake
       value: 0
@@ -26499,11 +26507,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 8272286033733916512, guid: 83628a2e699576147adabb30587f44d4, type: 3}
       propertyPath: m_LocalPosition.x
-      value: 42.36
+      value: 42.398
       objectReference: {fileID: 0}
     - target: {fileID: 8272286033733916512, guid: 83628a2e699576147adabb30587f44d4, type: 3}
       propertyPath: m_LocalPosition.y
-      value: 4.193
+      value: 3.733
       objectReference: {fileID: 0}
     - target: {fileID: 8272286033733916512, guid: 83628a2e699576147adabb30587f44d4, type: 3}
       propertyPath: m_LocalPosition.z
@@ -26606,7 +26614,7 @@ MonoBehaviour:
     serializedVersion: 2
     m_Bits: 64
   _climbOffset: {x: 0, y: 1, z: 0.16}
-  _crouchSpeed: 2
+  _crouchSpeed: 400
   _glideSpeed: 70
   _airDrag: 5
   _glideRotationSpeed: {x: 20, y: 40, z: 20}
