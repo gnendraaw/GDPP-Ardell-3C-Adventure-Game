@@ -1170,6 +1170,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::GameplayManager
   _inputManager: {fileID: 166451018}
+  _mainMenuSceneName: 
 --- !u!4 &838593408
 Transform:
   m_ObjectHideFlags: 0
@@ -2603,11 +2604,10 @@ MonoBehaviour:
   _cameraManager: {fileID: 1471069209}
   _input: {fileID: 166451018}
   _audioManager: {fileID: 919132148556680945}
-  _sprintSpeed: 6
-  _walkSpeed: 3
-  _acceleration: 6
+  _sprintSpeed: 450
+  _walkSpeed: 350
   _walkSprintTransition: 30
-  _jumpForce: 5
+  _jumpForce: 6
   _rotationSmoothTime: 0.1
   _groundDetector: {fileID: 1701759408}
   _groundLayer:
@@ -2615,18 +2615,18 @@ MonoBehaviour:
     m_Bits: 8
   _groundCheckRadius: 0.1
   _upperStepOffset: {x: 0, y: 0.3, z: 0.3}
-  _maxStepHeight: 0
+  _maxStepHeight: 0.16
   _stepCheckDistance: 0.1
-  _stepForce: 400
-  _climbSpeed: 1
+  _stepForce: 10
+  _climbSpeed: 20
   _climbDetector: {fileID: 283945466}
   _climbCheckDistance: 1
   _climbableLayer:
     serializedVersion: 2
     m_Bits: 64
   _climbOffset: {x: 0, y: 0, z: 0.16}
-  _crouchSpeed: 2
-  _glideSpeed: 70
+  _crouchSpeed: 350
+  _glideSpeed: 100
   _airDrag: 5
   _glideRotationSpeed: {x: 20, y: 40, z: 20}
   _minGlideRotationX: -10
@@ -2636,6 +2636,7 @@ MonoBehaviour:
   _hitLayer:
     serializedVersion: 2
     m_Bits: 128
+  _resetCheckpointPosition: {fileID: 0}
 --- !u!136 &919132148556680942
 CapsuleCollider:
   m_ObjectHideFlags: 0

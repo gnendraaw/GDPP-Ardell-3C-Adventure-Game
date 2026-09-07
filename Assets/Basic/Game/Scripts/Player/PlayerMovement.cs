@@ -109,6 +109,7 @@ public class PlayerMovement : MonoBehaviour
         Move(_cachedMoveInput);
         Glide();
         CheckIsGrounded();
+        CheckStep();
         SyncBodyRotateWithCamera();
     }
 
@@ -145,23 +146,16 @@ public class PlayerMovement : MonoBehaviour
 
     private void CheckStep()
     {
-        bool notMoving = _cachedMoveInput.sqrMagnitude <= 0.01f;
+        if (_cachedMoveInput.magnitude < 0.1f) return;
 
-        if (notMoving) return;
-        Vector3 lowerRayOrigin = _groundDetector.position;
-        Vector3 upperRayOrigin = _groundDetector.position + _upperStepOffset;
-        Vector3 forwardDirection = transform.forward;
+        bool isHitLowerStep = Physics.Raycast(_groundDetector.position, transform.forward, _stepCheckDistance, _groundLayer);
 
-        if (!Physics.Raycast(lowerRayOrigin, forwardDirection, out RaycastHit hit, _stepCheckDistance)) return;
-        if (Physics.Raycast(upperRayOrigin, forwardDirection, _stepCheckDistance)) return;
+        bool isHitUpperStep = Physics.Raycast(_groundDetector.position + _upperStepOffset, transform.forward, _stepCheckDistance, _groundLayer);
 
-        Vector3 downRayOrigin = upperRayOrigin + (forwardDirection * _stepCheckDistance);
-        if (!Physics.Raycast(downRayOrigin, Vector3.down, _upperStepOffset.y)) return;
-
-        float stepHeightDifference = hit.point.y - lowerRayOrigin.y;
-
-        Vector3 targetPosition = _rigidbody.position + new Vector3(0f, stepHeightDifference + 0.1f, 0f);
-        _rigidbody.MovePosition(targetPosition);
+        if (isHitLowerStep && !isHitUpperStep)
+        {
+            _rigidbody.AddForce(Vector3.up * _stepForce);
+        }
     }
 
     private void Move(Vector2 inputAxis)
