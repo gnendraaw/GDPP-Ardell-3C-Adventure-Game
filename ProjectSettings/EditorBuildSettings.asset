@@ -6,10 +6,10 @@ EditorBuildSettings:
   serializedVersion: 2
   m_Scenes:
   - enabled: 1
-    path: Assets/Basic/Game/Scenes/MainMenu.unity
-    guid: eeb1fca193c106e4581b664c47670ab8
+    path: Assets/Game/Scenes/ForestHillMainMenu.unity
+    guid: ba361a5a5f8a21b4baccaf52e1708eb5
   - enabled: 1
-    path: Assets/Basic/Game/Scenes/Gameplay.unity
-    guid: 99c9720ab356a0642a771bea13969a05
+    path: Assets/Game/Scenes/ForestHillGame.unity
+    guid: 5830d4189292bb34b85d3d8af243274f
   m_configObjects:
     com.unity.input.settings.actions: {fileID: -944628639613478452, guid: 052faaac586de48259a63d0c4782560b, type: 3}
