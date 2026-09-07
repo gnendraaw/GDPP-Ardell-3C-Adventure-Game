@@ -62,6 +62,9 @@ public class PlayerMovement : MonoBehaviour
     [SerializeField] private float _hitDetectorRadius;
     [SerializeField] private LayerMask _hitLayer;
 
+    [Header("Checkpoint Position")]
+    [SerializeField] private Transform _resetCheckpointPosition;
+
     private bool _isGrounded;
 
     private float _speed;
@@ -374,7 +377,7 @@ public class PlayerMovement : MonoBehaviour
         else if (_stance == PlayerStance.Crouch)
         {
             Vector3 checkerUpOrigin = transform.position + transform.up * 1.4f;
-            bool cantStand = Physics.Raycast(checkerUpOrigin, transform.up, 0.25f, _groundLayer);
+            bool cantStand = Physics.Raycast(checkerUpOrigin, transform.up, 0.55f, _groundLayer);
 
             if (cantStand) return;
 
@@ -452,6 +455,14 @@ public class PlayerMovement : MonoBehaviour
             if (hitObjects[i] == null) continue;
             Destroy(hitObjects[i].gameObject);
         }
+    }
+
+    public void ResetPositionToCheckpoint()
+    {
+        if (_resetCheckpointPosition == null) return;
+
+        transform.position = _resetCheckpointPosition.position;
+        transform.rotation = _resetCheckpointPosition.rotation;
     }
 
     private void OnDestroy()
